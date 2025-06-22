@@ -7,12 +7,10 @@ import com.keyin.domain.Passenger;
 import com.keyin.http.client.RESTClient;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
 public class HTTPRestCLIApplication {
-
 
     private final RESTClient client;
     private final Scanner scanner;
@@ -63,23 +61,15 @@ public class HTTPRestCLIApplication {
         }
     }
 
+
+
     private void listAirportsInCity() {
         while (true) {
             try {
                 System.out.print("Enter City ID: ");
                 long cityId = Long.parseLong(scanner.nextLine());
-                City city = client.getCityById(cityId);
-                List<Airport> airports = client.getAirportsByCity(cityId);
-
-                System.out.println("\nAirports in " + city.getName() + ", " + city.getProvince() + ":");
-                System.out.println("------------------------------------");
-                if (airports.isEmpty()) {
-                    System.out.println("• No airports found.");
-                } else {
-                    for (Airport a : airports) {
-                        System.out.println("• " + a.getName() + " (Code: " + a.getCode() + ")");
-                    }
-                }
+                String report = generateAirportsInCityReport(cityId);
+                System.out.println(report);
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -94,18 +84,8 @@ public class HTTPRestCLIApplication {
             try {
                 System.out.print("Enter Passenger ID: ");
                 long passengerId = Long.parseLong(scanner.nextLine());
-                Passenger passenger = client.getPassengerById(passengerId);
-                List<Aircraft> aircrafts = client.getAircraftsByPassenger(passengerId);
-
-                System.out.println("\nAircraft flown by " + passenger.getFirstName() + " " + passenger.getLastName() + ":");
-                System.out.println("-------------------------------------");
-                if (aircrafts.isEmpty()) {
-                    System.out.println("• No aircrafts found.");
-                } else {
-                    for (Aircraft a : aircrafts) {
-                        System.out.println("• " + a.getModel() + " (Airline: " + a.getAirlineName() + ")");
-                    }
-                }
+                String report = generateAircraftsByPassengerReport(passengerId);
+                System.out.println(report);
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -120,17 +100,8 @@ public class HTTPRestCLIApplication {
             try {
                 System.out.print("Enter Aircraft ID: ");
                 long aircraftId = Long.parseLong(scanner.nextLine());
-                List<Airport> airports = client.getAirportsByAircraft(aircraftId);
-
-                System.out.println("\nAirports used by Aircraft ID " + aircraftId + ":");
-                System.out.println("----------------------------------");
-                if (airports.isEmpty()) {
-                    System.out.println("• No airports found.");
-                } else {
-                    for (Airport a : airports) {
-                        System.out.println("• " + a.getName() + " (Code: " + a.getCode() + ")");
-                    }
-                }
+                String report = generateAirportsByAircraftReport(aircraftId);
+                System.out.println(report);
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -145,18 +116,8 @@ public class HTTPRestCLIApplication {
             try {
                 System.out.print("Enter Passenger ID: ");
                 long passengerId = Long.parseLong(scanner.nextLine());
-                Passenger passenger = client.getPassengerById(passengerId);
-                List<Airport> airports = client.getAirportsByPassenger(passengerId);
-
-                System.out.println("\nAirports used by " + passenger.getFirstName() + " " + passenger.getLastName() + ":");
-                System.out.println("------------------------------------");
-                if (airports.isEmpty()) {
-                    System.out.println("• No airports found.");
-                } else {
-                    for (Airport a : airports) {
-                        System.out.println("• " + a.getName() + " (Code: " + a.getCode() + ")");
-                    }
-                }
+                String report = generateAirportsByPassengerReport(passengerId);
+                System.out.println(report);
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -175,5 +136,78 @@ public class HTTPRestCLIApplication {
         System.out.println("3. List airports used by an aircraft");
         System.out.println("4. List airports used by a passenger");
         System.out.println("5. Exit");
+    }
+
+
+
+    public String generateAirportsInCityReport(long cityId) throws IOException, InterruptedException {
+        City city = client.getCityById(cityId);
+        List<Airport> airports = client.getAirportsByCity(cityId);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nAirports in ").append(city.getName()).append(", ").append(city.getProvince()).append(":\n");
+        sb.append("------------------------------------\n");
+
+        if (airports.isEmpty()) {
+            sb.append("• No airports found.");
+        } else {
+            for (Airport a : airports) {
+                sb.append("• ").append(a.getName()).append(" (Code: ").append(a.getCode()).append(")\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    public String generateAircraftsByPassengerReport(long passengerId) throws IOException, InterruptedException {
+        Passenger passenger = client.getPassengerById(passengerId);
+        List<Aircraft> aircrafts = client.getAircraftsByPassenger(passengerId);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nAircraft flown by ").append(passenger.getFirstName()).append(" ").append(passenger.getLastName()).append(":\n");
+        sb.append("-------------------------------------\n");
+
+        if (aircrafts.isEmpty()) {
+            sb.append("• No aircrafts found.");
+        } else {
+            for (Aircraft a : aircrafts) {
+                sb.append("• ").append(a.getModel()).append(" (Airline: ").append(a.getAirlineName()).append(")\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    public String generateAirportsByAircraftReport(long aircraftId) throws IOException, InterruptedException {
+        List<Airport> airports = client.getAirportsByAircraft(aircraftId);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nAirports used by Aircraft ID ").append(aircraftId).append(":\n");
+        sb.append("----------------------------------\n");
+
+        if (airports.isEmpty()) {
+            sb.append("• No airports found.");
+        } else {
+            for (Airport a : airports) {
+                sb.append("• ").append(a.getName()).append(" (Code: ").append(a.getCode()).append(")\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    public String generateAirportsByPassengerReport(long passengerId) throws IOException, InterruptedException {
+        Passenger passenger = client.getPassengerById(passengerId);
+        List<Airport> airports = client.getAirportsByPassenger(passengerId);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nAirports used by ").append(passenger.getFirstName()).append(" ").append(passenger.getLastName()).append(":\n");
+        sb.append("------------------------------------\n");
+
+        if (airports.isEmpty()) {
+            sb.append("• No airports found.");
+        } else {
+            for (Airport a : airports) {
+                sb.append("• ").append(a.getName()).append(" (Code: ").append(a.getCode()).append(")\n");
+            }
+        }
+        return sb.toString();
     }
 }
