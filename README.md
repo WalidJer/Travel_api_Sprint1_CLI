@@ -80,21 +80,46 @@ Enter Passenger ID: 3
 ## Project Structure
 
 ```
-TravelInfoCLI/
+Travel_api_Sprint1_CLI/
 ├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/keyin/
-│       │       ├── domain/         # Domain models (City, Airport, etc.)
-│       │       ├── cli/   # Main entry point (HTTPRestCLIApplication)
-│       │       └── client/ # API interaction logic (RESTClient)
+│   ├── main/
+│   │   └── java/
+│   │       └── com/keyin/
+│   │           ├── domain/         # Domain models (City, Airport, Passenger, Aircraft)
+│   │           └── http/
+│   │               ├── cli/        # CLI logic (HTTPRestCLIApplication)
+│   │               └── client/     # REST API client logic (RESTClient)
+│   └── test/
+│       └── java/
+│           └── com/keyin/
+│               ├── cli/           # Unit tests for CLI logic (HTTPRestCLIApplicationTest)
+│               └── client/        # Unit tests for REST client (RESTClientTest)
 ├── pom.xml
 └── README.md
 ```
 
+---
+
 ##  Testing
 
-Manual testing is performed via the interactive CLI, and the API endpoints are assumed to be already tested separately via tools like Postman or unit tests in the backend project.
+The project includes unit tests for both the CLI and the REST client logic.
+
+### HTTPRestCLIApplicationTest
+
+Tests the core user-facing logic by mocking the RESTClient:
+
+- Successful report generation for all options.
+- Empty result edge cases.
+- Error handling (e.g., not found, server errors).
+- Assertions include: `assertTrue`, `assertFalse`, `assertEquals`, `assertNotNull`, and `assertThrows`.
+
+### RESTClientTest
+
+Tests raw HTTP response handling using mocked responses:
+
+- Validates JSON deserialization.
+- Simulates different HTTP codes.
+- Covers edge cases like 404 errors.
 
 ---
 
